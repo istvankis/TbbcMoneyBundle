@@ -1,16 +1,16 @@
 <?php
 namespace Tbbc\MoneyBundle\Tests\Config;
 
+use Doctrine\DBAL\Types\Type;
 use Money\Money;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Tbbc\MoneyBundle\Money\MoneyManager;
 use Tbbc\MoneyBundle\Pair\PairManagerInterface;
-use Tbbc\MoneyBundle\Twig\CurrencyExtension;
-use Tbbc\MoneyBundle\Twig\MoneyExtension;
+use Tbbc\MoneyBundle\Twig\Extension\CurrencyExtension;
+use Tbbc\MoneyBundle\Twig\Extension\MoneyExtension;
 use Tbbc\MoneyBundle\Type\MoneyType;
-use Doctrine\DBAL\Types\Type;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 /**
  * @group functionnal
@@ -66,7 +66,7 @@ class ConfigTest
         /** @var MoneyManager $moneyManager */
         $moneyManager = $this->client->getContainer()->get("tbbc_money.money_manager");
         $money = $moneyManager->createMoneyFromFloat('2.5', 'USD');
-        $this->assertEquals("USD", $money->getCurrency()->getName());
+        $this->assertEquals("USD", $money->getCurrency()->getCode());
         $this->assertEquals(2500, $money->getAmount()); // note : 3 decimals in config for theses tests
     }
 

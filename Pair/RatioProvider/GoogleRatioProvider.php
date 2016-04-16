@@ -3,7 +3,6 @@
 namespace Tbbc\MoneyBundle\Pair\RatioProvider;
 
 use Money\Currency;
-use Money\UnknownCurrencyException;
 use Symfony\Component\DomCrawler\Crawler;
 use Tbbc\MoneyBundle\MoneyException;
 use Tbbc\MoneyBundle\Pair\RatioProviderInterface;
@@ -22,14 +21,14 @@ class GoogleRatioProvider implements RatioProviderInterface
     {
         try {
             $baseCurrency = new Currency($referenceCurrencyCode);
-        } catch (UnknownCurrencyException $e) {
+        } catch (\InvalidArgumentException $e) {
             throw new MoneyException(
                 sprintf('The currency code %s does not exists', $referenceCurrencyCode)
             );
         }
         try {
             $currency = new Currency($currencyCode);
-        } catch (UnknownCurrencyException $e) {
+        } catch (\InvalidArgumentException $e) {
             throw new MoneyException(
                 sprintf('The currency code %s does not exists', $currencyCode)
             );
@@ -55,8 +54,8 @@ class GoogleRatioProvider implements RatioProviderInterface
         return sprintf(
             'https://www.google.com/finance/converter?a=%s&from=%s&to=%s',
             $units,
-            $referenceCurrency->getName(),
-            $currency->getName()
+            $referenceCurrency->getCode(),
+            $currency->getCode()
         );
     }
 
@@ -67,12 +66,18 @@ class GoogleRatioProvider implements RatioProviderInterface
      */
     protected function getConvertedAmountFromResponse($response)
     {
-        $crawler = new Crawler($response);
-        $rawConvertedAmount = $crawler->filterXPath('//div[@id="currency_converter_result"]/span[@class="bld"]')->text();
-        $floatConvertedAmount = (float)$rawConvertedAmount;
+        try {
+            $crawler = new Crawler($response);
+            $rawConvertedAmount = $crawler->filterXPath(
+                '//div[@id="currency_converter_result"]/span[@class="bld"]'
+            )->text();
+            $floatConvertedAmount = (float)$rawConvertedAmount;
 
-        if (! $rawConvertedAmount || $floatConvertedAmount <= 0) {
-            throw new MoneyException("Cannot parse response from google finance converter API");
+            if (!$rawConvertedAmount || $floatConvertedAmount <= 0) {
+                throw new MoneyException("Cannot parse response from google finance converter API");
+            }
+        } catch (\InvalidArgumentException $e) {
+            throw new MoneyException("Cannot parse response from google finance converter API ".$e->getMessage());
         }
 
         return $floatConvertedAmount;

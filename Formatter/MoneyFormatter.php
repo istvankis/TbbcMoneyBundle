@@ -20,17 +20,6 @@ class MoneyFormatter
         $this->decimals = $decimals;
     }
 
-    protected function getDefaultNumberFormatter($currencyCode, $locale = null)
-    {
-        if (is_null($locale)) {
-            $locale = \Locale::getDefault();
-        }
-        $numberFormatter = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
-        $numberFormatter->setTextAttribute(\NumberFormatter::CURRENCY_CODE, $currencyCode);
-        $numberFormatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->decimals);
-        return $numberFormatter;
-    }
-
     /**
      * Format money with the NumberFormatter class
      *
@@ -47,46 +36,22 @@ class MoneyFormatter
     public function localizedFormatMoney(Money $money, $locale = null, \NumberFormatter $numberFormatter = null)
     {
         if (!($numberFormatter instanceof \NumberFormatter)) {
-            $numberFormatter = $this->getDefaultNumberFormatter($money->getCurrency()->getName(), $locale);
+            $numberFormatter = $this->getDefaultNumberFormatter($money->getCurrency()->getCode(), $locale);
         }
-        return $numberFormatter->formatCurrency($this->asFloat($money), $money->getCurrency()->getName());
+
+        return $numberFormatter->formatCurrency($this->asFloat($money), $money->getCurrency()->getCode());
     }
 
-    /**
-     * Formats the given Money object
-     * INCLUDING the currency symbol
-     *
-     * @param Money  $money
-     * @param string $decPoint
-     * @param string $thousandsSep
-     *
-     * @return string
-     */
-    public function formatMoney(Money $money, $decPoint = ',', $thousandsSep = ' ')
+    protected function getDefaultNumberFormatter($currencyCode, $locale = null)
     {
-        $symbol = $this->formatCurrency($money);
-        $amount = $this->formatAmount($money, $decPoint, $thousandsSep);
-        $price = $amount . " " . $symbol;
+        if (is_null($locale)) {
+            $locale = \Locale::getDefault();
+        }
+        $numberFormatter = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
+        $numberFormatter->setTextAttribute(\NumberFormatter::CURRENCY_CODE, $currencyCode);
+        $numberFormatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->decimals);
 
-        return $price;
-    }
-
-    /**
-     * Formats the amount part of the given Money object
-     * WITHOUT INCLUDING the currency symbol
-     *
-     * @param Money  $money
-     * @param string $decPoint
-     * @param string $thousandsSep
-     *
-     * @return string
-     */
-    public function formatAmount(Money $money, $decPoint = ',', $thousandsSep = ' ')
-    {
-        $amount = $this->asFloat($money);
-        $amount = number_format($amount, $this->decimals, $decPoint, $thousandsSep);
-
-        return $amount;
+        return $numberFormatter;
     }
 
     /**
@@ -102,6 +67,25 @@ class MoneyFormatter
         $amount = $amount / pow(10, $this->decimals);
 
         return $amount;
+    }
+
+    /**
+     * Formats the given Money object
+     * INCLUDING the currency symbol
+     *
+     * @param Money $money
+     * @param string $decPoint
+     * @param string $thousandsSep
+     *
+     * @return string
+     */
+    public function formatMoney(Money $money, $decPoint = ',', $thousandsSep = ' ')
+    {
+        $symbol = $this->formatCurrency($money);
+        $amount = $this->formatAmount($money, $decPoint, $thousandsSep);
+        $price = $amount." ".$symbol;
+
+        return $price;
     }
 
     /**
@@ -123,7 +107,25 @@ class MoneyFormatter
      */
     public function formatCurrencyAsSymbol(Currency $currency)
     {
-        return Intl::getCurrencyBundle()->getCurrencySymbol($currency->getName());
+        return Intl::getCurrencyBundle()->getCurrencySymbol($currency->getCode());
+    }
+
+    /**
+     * Formats the amount part of the given Money object
+     * WITHOUT INCLUDING the currency symbol
+     *
+     * @param Money $money
+     * @param string $decPoint
+     * @param string $thousandsSep
+     *
+     * @return string
+     */
+    public function formatAmount(Money $money, $decPoint = ',', $thousandsSep = ' ')
+    {
+        $amount = $this->asFloat($money);
+        $amount = number_format($amount, $this->decimals, $decPoint, $thousandsSep);
+
+        return $amount;
     }
 
     /**
@@ -134,7 +136,7 @@ class MoneyFormatter
      */
     public function formatCurrencyAsName(Currency $currency)
     {
-        return $currency->getName();
+        return $currency->getCode();
     }
 
     /**
