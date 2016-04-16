@@ -1,57 +1,38 @@
 <?php
 namespace Tbbc\MoneyBundle\Tests;
 
-use Tbbc\MoneyBundle\Tests\SchemaSetupListener;
-
-use Doctrine\Common\EventManager;
-use Doctrine\Common\Cache\ArrayCache;
-
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Configuration;
-use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
+use Doctrine\ORM\Tools\SchemaTool;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-use DoctrineExtensions\PHPUnit\OrmTestCase;
 
-class BundleOrmTestCase
-    extends OrmTestCase
+class BundleOrmTestCase extends KernelTestCase
 {
+
     /**
-     * @return \Doctrine\ORM\EntityManager
+     * @var EntityManager
      */
-    protected function createEntityManager()
+    protected $em;
+
+    protected function setUp()
     {
-        $eventManager = new EventManager();
-        $eventManager->addEventListener(array("preTestSetUp"), new SchemaSetupListener());
-        
-        $driver = new SimplifiedXmlDriver(array(
-            __DIR__ . '/../Resources/config/doctrine' => 'Tbbc\MoneyBundle\Entity'
-        ));
+        self::bootKernel();
 
-        // create config object
-        $config = new Configuration();
-        $config->setMetadataCacheImpl(new ArrayCache());
-        $config->setMetadataDriverImpl($driver);
-        $config->setProxyDir(__DIR__ . '/TestProxies');
-        $config->setProxyNamespace('Tbbc\MoneyBundle\Tests\TestProxies');
-        $config->setAutoGenerateProxyClasses(true);
-        //$config->setSQLLogger(new \Doctrine\DBAL\Logging\EchoSQLLogger());
+        $this->em = static::$kernel->getContainer()
+            ->get('doctrine')
+            ->getManager();
+        $metadatas = $this->em->getMetadataFactory()->getAllMetadata();
+        $schemaTool = new SchemaTool($this->em);
+        $schemaTool->dropDatabase();
+        $schemaTool->createSchema($metadatas);
 
-        // create entity manager
-        return EntityManager::create(
-            array(
-                'driver' => 'pdo_sqlite',
-                'path' => "/tmp/sqlite-tbbc-money-test.db"
-            ),
-            $config,
-            $eventManager
-        );
     }
 
     /**
-     * @return PHPUnit_Extensions_Database_DataSet_IDataSet
+     * @return EntityManager
      */
-    protected function getDataSet()
+    protected function getEntityManager()
     {
-        return $this->createXMLDataSet(__DIR__."/_doctrine/dataset/dataset.xml");
+        return $this->em;
     }
 }

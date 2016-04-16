@@ -1,9 +1,9 @@
 <?php
 namespace Tbbc\MoneyBundle\Tests\Pair\Storage;
 
-use Tbbc\MoneyBundle\Tests\BundleOrmTestCase;
-use Tbbc\MoneyBundle\Pair\Storage\DoctrineStorage;
 use Tbbc\MoneyBundle\Entity\DoctrineStorageRatio;
+use Tbbc\MoneyBundle\Pair\Storage\DoctrineStorage;
+use Tbbc\MoneyBundle\Tests\BundleOrmTestCase;
 
 /**
  * @group manager
@@ -15,17 +15,16 @@ class DoctrineStorageTest extends BundleOrmTestCase
      */
     protected $doctrineStorage;
 
+
     public function setUp()
     {
         parent::setUp();
-        
-        $this->doctrineStorage = new DoctrineStorage($this->getEntityManager(), 'USD');
+        $this->doctrineStorage = new DoctrineStorage($this->em, 'USD');
     }
     
     public function testLoadDefaultCurrency ()
     {
         $ratioList = $this->doctrineStorage->loadRatioList();
-
         $this->assertCount(1, $ratioList);
         $this->assertArrayHasKey('USD', $ratioList);
         $this->assertEquals(1, $ratioList['USD']);

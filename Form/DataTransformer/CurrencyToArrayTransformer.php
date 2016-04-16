@@ -3,10 +3,9 @@
 namespace Tbbc\MoneyBundle\Form\DataTransformer;
 
 use Money\Currency;
-use Money\UnknownCurrencyException;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Transforms between a Currency and a string
@@ -24,7 +23,8 @@ class CurrencyToArrayTransformer implements DataTransformerInterface
         if (!$value instanceof Currency) {
             throw new UnexpectedTypeException($value, 'Currency');
         }
-        return array("tbbc_name" => $value->getName());
+
+        return array("tbbc_name" => $value->getCode());
     }
 
     /**
@@ -43,7 +43,7 @@ class CurrencyToArrayTransformer implements DataTransformerInterface
         }
         try {
             return new Currency($value["tbbc_name"]);
-        } catch (UnknownCurrencyException $e) {
+        } catch (\InvalidArgumentException $e) {
             throw new TransformationFailedException($e->getMessage());
         }
     }

@@ -223,7 +223,7 @@ class TestMoney
     public function setPrice(Money $price)
     {
         $this->priceAmount = $price->getAmount();
-        $this->priceCurrency = $price->getCurrency()->getName();
+        $this->priceCurrency = $price->getCurrency()->getCode();
 
         return $this;
     }
@@ -449,7 +449,7 @@ Create a money from a float can be a bit tricky because of rounding issues.
 <?php
 $moneyManager = $this->get("tbbc_money.money_manager");
 $money = $moneyManager->createMoneyFromFloat('2.5', 'USD');
-$this->assertEquals("USD", $money->getCurrency()->getName());
+$this->assertEquals("USD", $money->getCurrency()->getCode());
 $this->assertEquals(250, $money->getAmount());
 ```
 

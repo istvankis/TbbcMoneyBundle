@@ -3,7 +3,6 @@
 namespace Tbbc\MoneyBundle\Pair\RatioProvider;
 
 use Money\Currency;
-use Money\UnknownCurrencyException;
 use Tbbc\MoneyBundle\MoneyException;
 use Tbbc\MoneyBundle\Pair\RatioProviderInterface;
 
@@ -22,14 +21,14 @@ class YahooFinanceRatioProvider implements RatioProviderInterface
     {
         try {
             $baseCurrency = new Currency($referenceCurrencyCode);
-        } catch (UnknownCurrencyException $e) {
+        } catch (\InvalidArgumentException $e) {
             throw new MoneyException(
                 sprintf('The currency code %s does not exists', $referenceCurrencyCode)
             );
         }
         try {
             $currency = new Currency($currencyCode);
-        } catch (UnknownCurrencyException $e) {
+        } catch (\InvalidArgumentException $e) {
             throw new MoneyException(
                 sprintf('The currency code %s does not exists', $currencyCode)
             );
@@ -77,8 +76,8 @@ class YahooFinanceRatioProvider implements RatioProviderInterface
     {
         return
             'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.xchange%20where%20pair%20in%20(%22'.
-            $referenceCurrency->getName().
-            $currency->getName().
+            $referenceCurrency->getCode().
+            $currency->getCode().
             '%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys';
     }
 
