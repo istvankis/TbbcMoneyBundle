@@ -138,146 +138,39 @@ $form = $this->createFormBuilder($testMoney)
 
 ### saving moneys in doctrine
 
-#### Solution 1 : two fields in the database
-
-Note that there is 2 columns in db : $priceAmount and $priceCurrency and only one
-getter/setter : getPrice and setPrice.
-
-The get/setPrice are dealing with these two columns transparently.
-
-* Advantage : your DB is clean and you can do sql sum, group by, sort,... with the amount and the currency
-in two different columns in your db
-* Default : it is ugly in the Entity.
+Embeddable Money
 
 ```php
 <?php
-namespace App\AdministratorBundle\Entity;
+namespace Tbbc\MoneyBundle\Tests\TestEntity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Money\Currency;
-use Money\Money;
+use Tbbc\MoneyBundle\Entity\Money;
 
 /**
- * TestMoney
- *
- * @ORM\Table("test_money")
+ * Class MoneyTestEntity
+ * @package Tbbc\MoneyBundle\Tests\TestEntity
  * @ORM\Entity
  */
-class TestMoney
+class MoneyTestEntity
 {
+
     /**
      * @var integer
-     *
-     * @ORM\Column(type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="price_amount", type="integer")
-     */
-    private $priceAmount;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="price_currency", type="string", length=64)
-     */
-    private $priceCurrency;
-
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * get Money
-     *
-     * @return Money
-     */
-    public function getPrice()
-    {
-        if (!$this->priceCurrency) {
-            return null;
-        }
-        if (!$this->priceAmount) {
-            return new Money(0, new Currency($this->priceCurrency));
-        }
-        return new Money($this->priceAmount, new Currency($this->priceCurrency));
-    }
-
-    /**
-     * Set price
-     *
-     * @param Money $price
-     * @return TestMoney
-     */
-    public function setPrice(Money $price)
-    {
-        $this->priceAmount = $price->getAmount();
-        $this->priceCurrency = $price->getCurrency()->getCode();
-
-        return $this;
-    }
-}
-```
-
-
-#### Solution 2 : use doctrine type
-
-There is only one string column in your DB. The money object is manually serialized by
-the new doctrine type.
-
-1.25€ is serialized in your DB by 'EUR 125'. *This format is stable. It won't change in future releases.*.
-
-The new doctrine type name is "money".
-
-* Advantage : The entity is easy to create and use
-* Default : it is more difficult to directly request de db in SQL.
-
-```php
-<?php
-namespace App\AdministratorBundle\Entity;
-
-use Doctrine\ORM\Mapping as ORM;
-use Money\Money;
-
-/**
- * TestMoney
- *
- * @ORM\Table("test_money")
- * @ORM\Entity
- */
-class TestMoney
-{
-    /**
-     * @var integer
-     *
      * @ORM\Column(type="integer")
-     * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @var Money
-     *
-     * @ORM\Column(name="price", type="money")
+     * @ORM\Embedded(class="Tbbc\MoneyBundle\Entity\Money")
      */
     private $price;
 
     /**
-     * Get id
-     *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -285,8 +178,6 @@ class TestMoney
     }
 
     /**
-     * get Money
-     *
      * @return Money
      */
     public function getPrice()
@@ -295,16 +186,13 @@ class TestMoney
     }
 
     /**
-     * Set price
-     *
      * @param Money $price
-     * @return TestMoney
      */
-    public function setPrice(Money $price)
+    public function setPrice($price)
     {
         $this->price = $price;
-        return $this;
     }
+
 }
 ```
 
@@ -438,7 +326,7 @@ tbbc_money:
 Add to your crontab :
 
 ```
-1 0 * * * /my_app_dir/app/console tbbc:money:ratio-fetch > /dev/null
+1 0 * * * /my_app_dir/bin/console tbbc:money:ratio-fetch > /dev/null
 ```
 
 ### MoneyManager : create a money from a float
@@ -554,8 +442,8 @@ Contributing
 Requirements
 ------------
 
-* PHP 5.3+
-* Symfony 2.1 +
+* PHP 5.5.9+
+* Symfony 3
 
 Authors
 -------
