@@ -2,17 +2,32 @@
 
 namespace Tbbc\MoneyBundle\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * Class DoctrineStorageRatio
+ * @package Tbbc\MoneyBundle\Entity
+ * @ORM\Entity
+ */
 class DoctrineStorageRatio
 {
+    /**
+     * @var integer
+     * @ORM\Id()
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
     private $id;
 
     /**
      * @var string
+     * @ORM\Column(type="string", length=3)
      */
     private $currencyCode;
 
     /**
      * @var integer
+     * @ORM\Column(type="float")
      */
     private $ratio;
     
@@ -33,19 +48,6 @@ class DoctrineStorageRatio
     }
 
     /**
-     * Set code
-     *
-     * @param  string $currencyCode
-     * @return Currency
-     */
-    public function setCurrencyCode($currencyCode)
-    {
-        $this->currencyCode = $currencyCode;
-
-        return $this;
-    }
-
-    /**
      * Get currencyCode
      *
      * @return string
@@ -53,6 +55,19 @@ class DoctrineStorageRatio
     public function getCurrencyCode()
     {
         return $this->currencyCode;
+    }
+
+    /**
+     * Set code
+     *
+     * @param  string $currencyCode
+     * @return DoctrineStorageRatio
+     */
+    public function setCurrencyCode($currencyCode)
+    {
+        $this->currencyCode = $currencyCode;
+
+        return $this;
     }
 
     /**
@@ -69,7 +84,7 @@ class DoctrineStorageRatio
      * Set ratio
      *
      * @param  float    $ratio
-     * @return Currency
+     * @return DoctrineStorageRatio
      */
     public function setRatio($ratio)
     {
