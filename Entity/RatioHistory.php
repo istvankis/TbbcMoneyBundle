@@ -1,37 +1,42 @@
 <?php
 namespace Tbbc\MoneyBundle\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Class RatioHistory
+ * @package Tbbc\MoneyBundle\Entity
+ * @ORM\Entity
+ */
 class RatioHistory
 {
     /**
      * @var integer
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
     /**
      * @var string
+     * @ORM\Column(type="string", length=3)
      */
     protected $referenceCurrencyCode;
     /**
      * @var string
+     * @ORM\Column(type="string", length=3)
      */
     protected $currencyCode;
     /**
-     * @var float
+     * @var integer
+     * @ORM\Column(type="float")
      */
     protected $ratio;
     /**
      * @var \DateTime
+     * @ORM\Column(type="datetime")
      */
     protected $savedAt;
-
-    /**
-     * @param string $currencyCode
-     */
-    public function setCurrencyCode($currencyCode)
-    {
-        $this->currencyCode = $currencyCode;
-    }
 
     /**
      * @return string
@@ -42,11 +47,11 @@ class RatioHistory
     }
 
     /**
-     * @param int $id
+     * @param string $currencyCode
      */
-    public function setId($id)
+    public function setCurrencyCode($currencyCode)
     {
-        $this->id = $id;
+        $this->currencyCode = $currencyCode;
     }
 
     /**
@@ -58,11 +63,11 @@ class RatioHistory
     }
 
     /**
-     * @param float $ratio
+     * @param int $id
      */
-    public function setRatio($ratio)
+    public function setId($id)
     {
-        $this->ratio = $ratio;
+        $this->id = $id;
     }
 
     /**
@@ -74,11 +79,11 @@ class RatioHistory
     }
 
     /**
-     * @param string $referenceCurrencyCode
+     * @param float $ratio
      */
-    public function setReferenceCurrencyCode($referenceCurrencyCode)
+    public function setRatio($ratio)
     {
-        $this->referenceCurrencyCode = $referenceCurrencyCode;
+        $this->ratio = $ratio;
     }
 
     /**
@@ -90,11 +95,11 @@ class RatioHistory
     }
 
     /**
-     * @param \DateTime $savedAt
+     * @param string $referenceCurrencyCode
      */
-    public function setSavedAt($savedAt)
+    public function setReferenceCurrencyCode($referenceCurrencyCode)
     {
-        $this->savedAt = $savedAt;
+        $this->referenceCurrencyCode = $referenceCurrencyCode;
     }
 
     /**
@@ -103,6 +108,14 @@ class RatioHistory
     public function getSavedAt()
     {
         return $this->savedAt;
+    }
+
+    /**
+     * @param \DateTime $savedAt
+     */
+    public function setSavedAt($savedAt)
+    {
+        $this->savedAt = $savedAt;
     }
 
 

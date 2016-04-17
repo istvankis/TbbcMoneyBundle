@@ -1,7 +1,6 @@
 <?php
 namespace Tbbc\MoneyBundle\Tests\Config;
 
-use Doctrine\DBAL\Types\Type;
 use Money\Money;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -10,7 +9,6 @@ use Tbbc\MoneyBundle\Money\MoneyManager;
 use Tbbc\MoneyBundle\Pair\PairManagerInterface;
 use Tbbc\MoneyBundle\Twig\Extension\CurrencyExtension;
 use Tbbc\MoneyBundle\Twig\Extension\MoneyExtension;
-use Tbbc\MoneyBundle\Type\MoneyType;
 
 /**
  * @group functionnal
@@ -114,14 +112,5 @@ class ConfigTest
         \Locale::setDefault('en');
         /** @var CurrencyExtension $currencyExtension */
         $currencyExtension = $this->client->getContainer()->get("tbbc_money.twig.currency");
-    }
-    
-    public function testDoctrineMoneyTypeAvailable()
-    {
-        
-        $this->assertTrue(Type::hasType(MoneyType::NAME));
-        
-        $em = $this->client->getContainer()->get('doctrine')->getManager('default');
-        $this->assertEquals(MoneyType::NAME, $em->getConnection()->getDatabasePlatform()->getDoctrineTypeMapping(MoneyType::NAME));
     }
 }
